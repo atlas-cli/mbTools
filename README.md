@@ -1,3 +1,5 @@
+[![Licença Proprietária](https://img.shields.io/badge/licença-proprietária-red.svg)](#-licença-e-uso)
+
 # MB Tools - Figma Plugin
 
 > ⚠️ **Em Desenvolvimento** - Este plugin ainda está em desenvolvimento ativo e algumas funcionalidades podem não estar finalizadas.
@@ -98,3 +100,15 @@ Este plugin foi criado para atender às necessidades específicas do MyBenk Desi
 ## Contribuição
 
 Este é um projeto interno da MyBenk em desenvolvimento. Para sugestões ou bugs, abra uma issue.
+
+## 📜 Licença e Uso
+
+Este projeto é **proprietário** e pertence a **Luka Machado Zinkoski**.  
+
+O plugin é entregue como um **extra** ao cliente, sem contrato específico, mas com direito de uso garantido.  
+
+### Condições:
+- O cliente pode **usar o plugin** livremente em seu ambiente.  
+- Não é permitido **redistribuir, sublicenciar, vender ou modificar** o código.  
+- Todos os direitos permanecem com o autor original.  
+- O cliente terá acesso também às **melhorias futuras** que estão sendo planejadas e implementadas no plugin.  
