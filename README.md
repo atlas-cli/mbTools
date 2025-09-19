@@ -1,3 +1,5 @@
+[![Licença Proprietária](https://img.shields.io/badge/licença-proprietária-red.svg)](#-licença-e-uso)
+
 # MB Tools - Figma Plugin
 
 > ⚠️ **Em Desenvolvimento** - Este plugin ainda está em desenvolvimento ativo e algumas funcionalidades podem não estar finalizadas.
@@ -28,11 +30,11 @@ Padroniza nomenclatura de ícones conforme diretrizes do Lucide Icons:
 1. Clone o repositório
 2. Instale as dependências:
    ```bash
-   npm install
+   pnpm install
    ```
 3. Execute o build:
    ```bash
-   npm run build
+   pnpm run build
    ```
 4. No Figma, vá em **Plugins** → **Development** → **Import plugin from manifest**
 5. Selecione o arquivo `manifest.json` na raiz do projeto
@@ -56,13 +58,13 @@ Padroniza nomenclatura de ícones conforme diretrizes do Lucide Icons:
 
 ```bash
 # Build do projeto
-npm run build
+pnpm run build
 
 # Build com watch (desenvolvimento)
-npm run watch
+pnpm run watch
 
 # Limpar arquivos de build
-npm run clean
+pnpm run clean
 ```
 
 ## Estrutura do Projeto
@@ -98,3 +100,15 @@ Este plugin foi criado para atender às necessidades específicas do MyBenk Desi
 ## Contribuição
 
 Este é um projeto interno da MyBenk em desenvolvimento. Para sugestões ou bugs, abra uma issue.
+
+## 📜 Licença e Uso
+
+Este projeto é **proprietário** e pertence a **Luka Machado Zinkoski**.  
+
+O plugin é entregue como um **extra** ao cliente, sem contrato específico, mas com direito de uso garantido.  
+
+### Condições:
+- O cliente pode **usar o plugin** livremente em seu ambiente.  
+- Não é permitido **redistribuir, sublicenciar, vender ou modificar** o código.  
+- Todos os direitos permanecem com o autor original.  
+- O cliente terá acesso também às **melhorias futuras** que estão sendo planejadas e implementadas no plugin.  
