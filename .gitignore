@@ -34,5 +34,5 @@ package-lock.json
 .pnpm-debug.log
 
 # arquivos de IA
-*.md
+CLAUDE.md
 repomix-output.xml
