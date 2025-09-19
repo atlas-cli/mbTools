@@ -1,7 +1,7 @@
-# Normaliza quebras de linha para LF (Unix-style) em todos os arquivos de texto
+# Normaliza quebras de linha para LF
 * text=auto eol=lf
 
-# Arquivos binários não devem ser modificados
+# Trata arquivos binários (evita problemas de encoding)
 *.png binary
 *.jpg binary
 *.jpeg binary
@@ -9,6 +9,17 @@
 *.svg binary
 *.ico binary
 *.pdf binary
+*.ttf binary
 *.woff binary
 *.woff2 binary
-*.ttf binary
+
+# Evita conversão acidental em arquivos executáveis
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.rar binary
