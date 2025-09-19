@@ -33,14 +33,9 @@ async function bundle() {
 function copyStatic() {
   try {
     mkdirSync('dist/assets', { recursive: true });
-    // Prepare logo (prefer repo root mb-logo.svg)
-    let logoSrc = resolve('..', 'mb-logo.svg');
-    try {
-      copyFileSync(logoSrc, resolve('dist/assets/mb-logo.svg'));
-    } catch {
-      logoSrc = resolve('assets/mb-logo.svg');
-      copyFileSync(logoSrc, resolve('dist/assets/mb-logo.svg'));
-    }
+    // Use local logo from assets
+    const logoSrc = resolve('assets/mb-logo.svg');
+    copyFileSync(logoSrc, resolve('dist/assets/mb-logo.svg'));
     const logoB64 = readFileSync(logoSrc).toString('base64');
 
     // Copy UI and inline logo as data URI for inline-HTML runtime
