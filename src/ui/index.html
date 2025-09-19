@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MB Tools</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif; margin: 0; color: #222; }
+    .wrap { display: grid; grid-template-rows: 56px 1fr; height: 100vh; }
+    header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #e5e5e5; }
+    header img { height: 28px; width: 28px; }
+    header h1 { font-size: 14px; margin: 0; font-weight: 600; }
+    .main { display: grid; grid-template-columns: 120px 1fr; height: calc(100vh - 56px); }
+    nav { border-right: 1px solid #e5e5e5; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+    nav button { text-align: left; background: #f7f7f7; border: 1px solid #e5e5e5; border-radius: 6px; padding: 8px; font-size: 12px; cursor: pointer; }
+    nav button.active { background: #eaeaea; border-color: #d2d2d2; }
+    section { padding: 12px; }
+    .hidden { display: none; }
+    .status-box { width: 100%; padding: 10px; border-radius: 6px; text-align: center; font-weight: 500; }
+    .status-default { background: #f5f5f5; color: #666; }
+    .status-ready { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .status-busy { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .btn { padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; background: #111; color: #fff; cursor: pointer; font-size: 12px; }
+    .btn[disabled] { opacity: .5; cursor: not-allowed; }
+    .muted { color: #666; font-size: 12px; }
+    .vspace { height: 10px; }
+    .list { max-height: 100px; overflow-y: auto; font-size: 12px; color: #c00; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="assets/mb-logo.svg" alt="MB" />
+      <h1>MB Tools</h1>
+    </header>
+    <div class="main">
+      <nav>
+        <button id="tab-style" class="active">Styles→Vars</button>
+        <button id="tab-icons">Icon Rename</button>
+      </nav>
+      <section>
+        <div id="panel-style">
+          <p class="muted">Converter estilos de cor antigos para variables correspondentes.</p>
+          <div class="vspace"></div>
+          <div id="styleStatus" class="status-box status-default">Selecione ao menos um frame/section</div>
+          <div class="vspace"></div>
+          <button id="btnConvert" class="btn" disabled>Converter Seleção</button>
+        </div>
+        <div id="panel-icons" class="hidden">
+          <p class="muted">Renomeia componentes selecionados para PascalCase com validação Lucide.</p>
+          <div class="vspace"></div>
+          <button id="btnRename" class="btn">Renomear Componentes</button>
+          <div class="vspace"></div>
+          <div id="iconsStatus" class="muted"></div>
+          <div id="invalidList" class="list"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const tabStyle = document.getElementById('tab-style');
+    const tabIcons = document.getElementById('tab-icons');
+    const panelStyle = document.getElementById('panel-style');
+    const panelIcons = document.getElementById('panel-icons');
+    const styleStatus = document.getElementById('styleStatus');
+    const btnConvert = document.getElementById('btnConvert');
+    const btnRename = document.getElementById('btnRename');
+    const iconsStatus = document.getElementById('iconsStatus');
+    const invalidList = document.getElementById('invalidList');
+
+    function showTab(tab) {
+      if (tab === 'style') {
+        tabStyle.classList.add('active');
+        tabIcons.classList.remove('active');
+        panelStyle.classList.remove('hidden');
+        panelIcons.classList.add('hidden');
+      } else {
+        tabIcons.classList.add('active');
+        tabStyle.classList.remove('active');
+        panelIcons.classList.remove('hidden');
+        panelStyle.classList.add('hidden');
+      }
+    }
+
+    tabStyle.onclick = () => showTab('style');
+    tabIcons.onclick = () => showTab('icons');
+
+    // Style module state
+    const styleState = { selectionState: 'none', styleCount: 0, isConverting: false };
+
+    function updateStyleUI() {
+      let text = 'Selecione ao menos um frame/section';
+      let cls = 'status-default';
+      if (styleState.isConverting) { text = 'Convertendo...'; cls = 'status-busy'; }
+      else {
+        if (styleState.selectionState === 'no-styles') text = 'Nenhum estilo detectado';
+        else if (styleState.selectionState === 'ready') { text = `${styleState.styleCount} estilos detectados`; cls = 'status-ready'; }
+      }
+      styleStatus.textContent = text;
+      styleStatus.className = `status-box ${cls}`;
+      btnConvert.disabled = !(styleState.selectionState === 'ready' && !styleState.isConverting);
+    }
+
+    btnConvert.onclick = () => {
+      styleState.isConverting = true;
+      updateStyleUI();
+      parent.postMessage({ pluginMessage: { module: 'style', type: 'convert' } }, '*');
+    };
+
+    // Icons module
+    btnRename.onclick = () => {
+      iconsStatus.textContent = 'Renomeando...';
+      invalidList.textContent = '';
+      parent.postMessage({ pluginMessage: { module: 'icons', type: 'rename-icons' } }, '*');
+    };
+
+    // Incoming messages
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+      // Style
+      if (msg.module === 'style') {
+        switch (msg.type) {
+          case 'selection-update':
+            styleState.selectionState = !msg.hasSelection ? 'none' : (msg.count === 0 ? 'no-styles' : 'ready');
+            styleState.styleCount = msg.count || 0;
+            styleState.isConverting = false;
+            updateStyleUI();
+            break;
+          case 'conversion-complete':
+            styleState.isConverting = false;
+            setTimeout(() => parent.postMessage({ pluginMessage: { module: 'style', type: 'check-selection' } }, '*'), 300);
+            break;
+          case 'error':
+            styleState.isConverting = false;
+            updateStyleUI();
+            break;
+        }
+      }
+      // Icons
+      if (msg.module === 'icons') {
+        if (msg.type === 'done') {
+          if (msg.invalidNames && msg.invalidNames.length > 0) {
+            iconsStatus.textContent = '⚠️ Alguns nomes são inválidos:';
+            invalidList.innerHTML = msg.invalidNames.map((n) => `• ${n}`).join('<br/>');
+          } else {
+            iconsStatus.textContent = '✅ Todos os nomes são válidos!';
+            invalidList.textContent = '';
+          }
+        }
+      }
+    };
+
+    // Initial selection check for style module
+    parent.postMessage({ pluginMessage: { module: 'style', type: 'check-selection' } }, '*');
+  </script>
+</body>
+</html>
