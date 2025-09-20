@@ -109,7 +109,7 @@ function hexToFigmaRGBA(hex: string): RGBA {
 }
 
 // Busca ou cria coleção de variáveis "colors-tokens"
-async function getOrCreateColorsTokensCollection(): Promise<{ collection: VariableCollection; modeId: string }> {
+async function getOrCreateColorsTokensCollection(): Promise<{ collection: VariableCollection; lightModeId: string; darkModeId: string }> {
   const collections = await figma.variables.getLocalVariableCollectionsAsync();
 
   // Busca coleção existente
@@ -123,13 +123,29 @@ async function getOrCreateColorsTokensCollection(): Promise<{ collection: Variab
     console.log('✅ Coleção "colors-tokens" encontrada');
   }
 
-  // Garante que existe pelo menos um modo
-  const modeId = collection.modes[0]?.modeId;
-  if (!modeId) {
-    throw new Error('Nenhum modo encontrado na coleção colors-tokens');
+  // Busca ou cria modos 'light' e 'dark'
+  let lightMode = collection.modes.find(m => m.name === 'light');
+  let darkMode = collection.modes.find(m => m.name === 'dark');
+
+  if (!lightMode) {
+    lightMode = collection.addMode('light');
+    console.log('✅ Modo "light" criado');
+  } else {
+    console.log('✅ Modo "light" encontrado');
   }
 
-  return { collection, modeId };
+  if (!darkMode) {
+    darkMode = collection.addMode('dark');
+    console.log('✅ Modo "dark" criado');
+  } else {
+    console.log('✅ Modo "dark" encontrado');
+  }
+
+  return {
+    collection,
+    lightModeId: lightMode.modeId,
+    darkModeId: darkMode.modeId
+  };
 }
 
 // Busca ou cria variável de cor
@@ -195,7 +211,7 @@ function generateColorPalette(baseHex: string): Record<string, string> {
 
 // Aplica paleta de cores nas variáveis do Figma
 async function applyPaletteToFigma(palette: Record<string, string>): Promise<number> {
-  const { collection, modeId } = await getOrCreateColorsTokensCollection();
+  const { collection, lightModeId, darkModeId } = await getOrCreateColorsTokensCollection();
 
   let updatedCount = 0;
 
@@ -204,11 +220,14 @@ async function applyPaletteToFigma(palette: Record<string, string>): Promise<num
       // Busca ou cria variável
       const variable = await getOrCreateColorVariable(fullName, collection);
 
-      // Converte HEX para formato Figma e aplica
+      // Converte HEX para formato Figma
       const rgba = hexToFigmaRGBA(hex);
-      variable.setValueForMode(modeId, rgba);
 
-      console.log(`✅ Atualizado: ${fullName} → ${hex}`);
+      // Aplica a mesma cor nos modos light e dark
+      variable.setValueForMode(lightModeId, rgba);
+      variable.setValueForMode(darkModeId, rgba);
+
+      console.log(`✅ Atualizado: ${fullName} → ${hex} (light e dark)`);
       updatedCount++;
 
     } catch (error) {
