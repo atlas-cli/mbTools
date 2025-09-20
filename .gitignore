@@ -36,3 +36,6 @@ package-lock.json
 # arquivos de IA
 CLAUDE.md
 repomix-output.xml
+AGENTS.md
+GEMINI.md
+.claude/

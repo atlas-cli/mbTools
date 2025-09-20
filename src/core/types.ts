@@ -1,4 +1,4 @@
-export type ModuleId = 'style' | 'icons';
+export type ModuleId = 'style' | 'icons' | 'color-palette';
 
 export interface UIMsg<T extends string = string, P = any> {
   module: ModuleId;

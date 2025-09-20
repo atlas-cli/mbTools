@@ -1,5 +1,5 @@
 import type { Module } from '../../core/types';
-import lucideNames from '../../../../mbIconRename/lucide-names.json';
+import lucideNames from '.././../../assets/lucide-names.json';
 
 function kebabToPascalCase(str: string) {
   return str

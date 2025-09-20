@@ -36,6 +36,7 @@
       <nav>
         <button id="tab-style" class="active">Styles→Vars</button>
         <button id="tab-icons">Icon Rename</button>
+        <button id="tab-color">Color Palette</button>
       </nav>
       <section>
         <div id="panel-style">
@@ -53,6 +54,24 @@
           <div id="iconsStatus" class="muted"></div>
           <div id="invalidList" class="list"></div>
         </div>
+        <div id="panel-color" class="hidden">
+          <p class="muted">Gera paleta de cores primária a partir de um valor HEX base.</p>
+          <div class="vspace"></div>
+          <label for="hexInput" class="muted">Cor Primária (HEX):</label>
+          <div class="vspace"></div>
+          <input
+            id="hexInput"
+            type="text"
+            placeholder="#4133A6"
+            style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;"
+          />
+          <div class="vspace"></div>
+          <button id="btnGenerate" class="btn" disabled>Gerar e Aplicar Paleta</button>
+          <div class="vspace"></div>
+          <div id="colorStatus" class="status-box status-default">Insira um valor HEX válido (ex: #4133A6)</div>
+          <div class="vspace"></div>
+          <div id="palettePreview" class="muted"></div>
+        </div>
       </section>
     </div>
   </div>
@@ -60,30 +79,47 @@
   <script>
     const tabStyle = document.getElementById('tab-style');
     const tabIcons = document.getElementById('tab-icons');
+    const tabColor = document.getElementById('tab-color');
     const panelStyle = document.getElementById('panel-style');
     const panelIcons = document.getElementById('panel-icons');
+    const panelColor = document.getElementById('panel-color');
     const styleStatus = document.getElementById('styleStatus');
     const btnConvert = document.getElementById('btnConvert');
     const btnRename = document.getElementById('btnRename');
+    const btnGenerate = document.getElementById('btnGenerate');
     const iconsStatus = document.getElementById('iconsStatus');
     const invalidList = document.getElementById('invalidList');
+    const hexInput = document.getElementById('hexInput');
+    const colorStatus = document.getElementById('colorStatus');
+    const palettePreview = document.getElementById('palettePreview');
 
     function showTab(tab) {
+      // Remove active from all tabs
+      tabStyle.classList.remove('active');
+      tabIcons.classList.remove('active');
+      tabColor.classList.remove('active');
+
+      // Hide all panels
+      panelStyle.classList.add('hidden');
+      panelIcons.classList.add('hidden');
+      panelColor.classList.add('hidden');
+
+      // Show selected tab and panel
       if (tab === 'style') {
         tabStyle.classList.add('active');
-        tabIcons.classList.remove('active');
         panelStyle.classList.remove('hidden');
-        panelIcons.classList.add('hidden');
-      } else {
+      } else if (tab === 'icons') {
         tabIcons.classList.add('active');
-        tabStyle.classList.remove('active');
         panelIcons.classList.remove('hidden');
-        panelStyle.classList.add('hidden');
+      } else if (tab === 'color') {
+        tabColor.classList.add('active');
+        panelColor.classList.remove('hidden');
       }
     }
 
     tabStyle.onclick = () => showTab('style');
     tabIcons.onclick = () => showTab('icons');
+    tabColor.onclick = () => showTab('color');
 
     // Style module state
     const styleState = { selectionState: 'none', styleCount: 0, isConverting: false };
@@ -112,6 +148,58 @@
       iconsStatus.textContent = 'Renomeando...';
       invalidList.textContent = '';
       parent.postMessage({ pluginMessage: { module: 'icons', type: 'rename-icons' } }, '*');
+    };
+
+    // Color Palette module
+    const hexPattern = /^#([0-9A-F]{3}|[0-9A-F]{6})$/i;
+    let isGenerating = false;
+
+    function validateHex(hex) {
+      return hexPattern.test(hex);
+    }
+
+    function updateColorUI() {
+      const hex = hexInput.value.trim();
+      const isValid = validateHex(hex);
+
+      if (!hex) {
+        colorStatus.textContent = 'Insira um valor HEX válido (ex: #4133A6)';
+        colorStatus.className = 'status-box status-default';
+        btnGenerate.disabled = true;
+      } else if (!isValid) {
+        colorStatus.textContent = 'Formato HEX inválido. Use #RGB ou #RRGGBB';
+        colorStatus.className = 'status-box status-default';
+        btnGenerate.disabled = true;
+      } else if (isGenerating) {
+        colorStatus.textContent = 'Gerando paleta de cores...';
+        colorStatus.className = 'status-box status-busy';
+        btnGenerate.disabled = true;
+      } else {
+        colorStatus.textContent = `Pronto para gerar paleta com ${hex}`;
+        colorStatus.className = 'status-box status-ready';
+        btnGenerate.disabled = false;
+      }
+    }
+
+    // Real-time validation
+    hexInput.oninput = updateColorUI;
+
+    // Generate button click
+    btnGenerate.onclick = () => {
+      const hex = hexInput.value.trim();
+      if (!validateHex(hex)) return;
+
+      isGenerating = true;
+      updateColorUI();
+      palettePreview.textContent = '';
+
+      parent.postMessage({
+        pluginMessage: {
+          module: 'color-palette',
+          type: 'generate-palette',
+          payload: { hex }
+        }
+      }, '*');
     };
 
     // Incoming messages
@@ -148,6 +236,33 @@
             invalidList.textContent = '';
           }
         }
+      }
+      // Color Palette
+      if (msg.module === 'color-palette') {
+        isGenerating = false;
+
+        if (msg.type === 'palette-applied') {
+          const { palette, updatedCount, baseColor } = msg.payload;
+          colorStatus.textContent = `✅ ${updatedCount} variáveis criadas/atualizadas na coleção "colors-tokens"`;
+          colorStatus.className = 'status-box status-ready';
+
+          // Show palette preview
+          const paletteEntries = Object.entries(palette);
+          palettePreview.innerHTML = paletteEntries.map(([name, hex]) =>
+            `<div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
+              <div style="width: 20px; height: 20px; background: ${hex}; border: 1px solid #ddd; border-radius: 3px;"></div>
+              <span style="font-family: monospace; font-size: 11px;">${name}: ${hex}</span>
+            </div>`
+          ).join('');
+
+        } else if (msg.type === 'error') {
+          const { message } = msg.payload;
+          colorStatus.textContent = `❌ Erro: ${message}`;
+          colorStatus.className = 'status-box status-default';
+          palettePreview.textContent = '';
+        }
+
+        updateColorUI();
       }
     };
 
