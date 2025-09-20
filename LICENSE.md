@@ -1,23 +1,21 @@
-# Licença de Uso Restrito
+MIT License
 
-Copyright (c) 2025 Luka Machado Zinkoski  
-Todos os direitos reservados.
+Copyright (c) 2025 Luka Machado Zinkoski
 
-Este repositório contém código **proprietário**.  
-A visualização do código é permitida apenas para fins de transparência do desenvolvimento.  
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-## Termos de Uso
-- O uso é autorizado **exclusivamente** aos clientes para os quais este plugin foi entregue.  
-- Esta autorização é **limitada, não exclusiva e intransferível**, e restringe-se ao escopo do projeto fornecido.  
-- O cliente terá acesso também às **melhorias futuras** planejadas e implementadas neste plugin, enquanto permanecer o vínculo de entrega.  
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-## Restrições
-Não é permitido:  
-- Compartilhar este código com terceiros não autorizados.  
-- Utilizar o código em outros projetos além do fornecido.  
-- Remover ou alterar avisos de direitos autorais.  
-- Sublicenciar, vender ou alugar o software.  
-
-## Garantia
-Este software é fornecido **"no estado em que se encontra"**, sem garantias de qualquer tipo.  
-A responsabilidade por uso indevido ou por danos é limitada aos termos acordados com o cliente no momento da entrega.  
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
